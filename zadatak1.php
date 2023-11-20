@@ -1,8 +1,9 @@
 <?php
 
 class BankAccount{
-    private float $stanjeNaRacunu = 0;
-    private  bool $blokiran = false;
+    protected float $stanjeNaRacunu = 0;
+    protected  bool $blokiran = false;
+
   
     public function getStanjeNaRacunu(): string{
         return $this->stanjeNaRacunu;
@@ -47,19 +48,21 @@ class BankAccount{
 class User{
     public string $firstName;
     public string $lastName;
-    public string $racun;
+    public SimpleBankAccount $simpleRacun;
+    public SecuredBankAccount $securedRacun;
 
-    function __construct(string $firstName, string $lastName, string $racun)
+    function __construct(string $firstName, string $lastName)
     {
         $this->firstName=$firstName;
         $this->lastName=$lastName;
-        $this->racun=$racun;
+        $this->simpleRacun=  new SimpleBankAccount();
+        $this->securedRacun= new SecuredBankAccount();
     }
     public function getFirstName(): string{
         return $this->firstName;
     }
 
-    public function setfirstName($ime): void{
+    public function setfirstName($firstName): void{
         $this->firstName ;
     }
 
@@ -67,15 +70,40 @@ class User{
         return $this->lastName;
     }
 
-    public function setPrezime($prezime): void {
+    public function setPrezime($lastName): void {
         $this->lastName;
     }
 
 }
 
-$objekat = new BankAccount();
-$objekat->podigniNovac(2000);
-$objekat->podigniNovac(2000);
 
-$objekat->uplatiNovac(4000);
-$objekat->podigniNovac(2000);
+
+class SimpleBankAccount extends BankAccount{
+
+}
+
+class SecuredBankAccount extends BankAccount {
+    public function podigniNovac($iznos) {
+        $provizija = $iznos * 0.025; 
+        $ukupno = $iznos + $provizija; 
+        if ($this->blokiran) {
+            echo "Račun je blokiran. Ne možete podići novac.";
+        } else if ($this->stanjeNaRacunu - $ukupno < -1000) {
+            echo "Ne možete podići novac jer bi stanje na računu bilo manje od -1000.";
+        } else {
+            $this->stanjeNaRacunu -= $ukupno;
+            echo "Podigli ste $iznos. Provizija je $provizija. Trenutno stanje na računu je $this->stanjeNaRacunu.";
+        }
+
+        if($this->stanjeNaRacunu <= -1000){
+            $this->blokiran = true;
+            echo "Vaš račun je sada blokiran jer je stanje manje od -1000.";
+        }
+    }
+
+    
+}
+
+$noviUser = new User("Marko", "Markovic");
+
+$noviUser->securedRacun->podigniNovac(100);
