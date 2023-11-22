@@ -30,9 +30,18 @@ abstract class Artikli{
         $this->lager = $lager;
     }
 
-    public function samnjiStanje(){
+    public function smanjiStanje(){
         return $this->lager--;
     }    
+
+    public function povecajStanje(){
+        return $this->lager++;
+    }
+
+
+    public function getCena(): float{
+        return $this->cena ;
+    }
 }
    
 
@@ -115,39 +124,65 @@ class Gpu extends Artikli{
 
 
 class Prodavnica{
-private $artikliProdavnica = [];
-public $balans = 0;
+    private $artikliProdavnica = [];
+    public $balans = 0;
 
-public function dodajArtikle($artikliProdavnica){
+    public function dodajArtikle($artikliProdavnica){
     $this->artikliProdavnica = $artikliProdavnica;
 }
 
-public function listInfo(){
+    public function listInfo(){
     foreach($this->artikliProdavnica as $artikal){
         $artikal->prikaziInfo();
     }
 }
 
-public function dodajZaradu($iznos){
+    public function dodajZaradu($iznos){
     $this->balans += $iznos;
 }
 
-public function prikaziBalans(){
+    public function prikaziBalans(){
     return $this->balans;
 }
 
-public function sellArticle(Artikli $artikal) {
+    public function sellArticle(Artikli $artikal) {
     if(in_array($artikal, $this->artikliProdavnica) && $artikal->stanje() >= 1) {
-        $artikal->samnjiStanje(); 
-        return true;
+        $artikal->smanjiStanje(); 
+        echo "Uspesno ste prodali" . $artikal;
+        $this->dodajZaradu($artikal->getCena());
     } else {
-        return false;
+        echo "Nije moguce prodati" . $artikal;
+        }
+}
+
+    public function pozajmiArtikal(Artikli $artikal){
+        if(in_array($artikal, $this->artikliProdavnica) && $artikal->stanje() > 0){
+            $artikal->smanjiStanje();
+            $this->balans += $artikal->getCena() /4;
+            echo "Artikal je pozajmljen";
+        }else {
+            echo "Artikal nije moguce pozajmiti";
+        }
     }
+
+    public function vratiArtikal(Artikli $artikal){
+        if(in_array($artikal, $this->artikliProdavnica)){
+            $artikal->povecajStanje();
+            echo "Artikal je vracen sa pozajmice";
+        }else{
+            echo "Artikal nije vracen";
+        }
+    }
+
 
     
 }
-}
 
+
+interface Loan{
+    public function pozajmiArtikal();
+    public function vratiArtikal();
+}
 
 
 
