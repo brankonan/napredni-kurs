@@ -19,7 +19,21 @@ abstract class Artikli{
     public function prikaziInfo(){
         echo "Serijski broj:|" . $this->serijskiBroj . " Proizvodjac:" . $this->proizvodjac  . "Model:" . $this->model . "Cena:" . $this->cena . "Lager:" . $this->lager;
     }
+
+
+    public function stanje(){
+        return $this->lager;
     }
+
+
+    public function setStanje($lager){
+        $this->lager = $lager;
+    }
+
+    public function samnjiStanje(){
+        return $this->lager--;
+    }    
+}
    
 
 
@@ -102,6 +116,7 @@ class Gpu extends Artikli{
 
 class Prodavnica{
 private $artikliProdavnica = [];
+public $balans = 0;
 
 public function dodajArtikle($artikliProdavnica){
     $this->artikliProdavnica = $artikliProdavnica;
@@ -113,7 +128,27 @@ public function listInfo(){
     }
 }
 
+public function dodajZaradu($iznos){
+    $this->balans += $iznos;
 }
+
+public function prikaziBalans(){
+    return $this->balans;
+}
+
+public function sellArticle(Artikli $artikal) {
+    if(in_array($artikal, $this->artikliProdavnica) && $artikal->stanje() >= 1) {
+        $artikal->samnjiStanje(); 
+        return true;
+    } else {
+        return false;
+    }
+
+    
+}
+}
+
+
 
 
 
